@@ -1,5 +1,5 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.150.0';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.150.0/examples/jsm/loaders/GLTFLoader.js';
 
 const video = document.getElementById('camera');
 const canvas = document.getElementById('qrCanvas');

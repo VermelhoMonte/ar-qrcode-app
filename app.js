@@ -40,6 +40,7 @@ function scanQRCode() {
 
     if (code) {
         console.log('QR Code detected:', code.data);
+        document.body.innerHTML += `<p>QR Code detected: ${code.data}</p>`; // Display QR code content        
         load3DModel();
     } else {
         requestAnimationFrame(scanQRCode);

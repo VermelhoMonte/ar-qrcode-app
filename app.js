@@ -11,6 +11,7 @@ navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
     .then(stream => {
         video.srcObject = stream;
         video.play();
+        document.body.innerHTML += `<p>Camera stream started</p>`;
         console.log('Camera stream started');
     })
     .catch((error) => {
@@ -56,6 +57,6 @@ function scanQRCode() {
 video.addEventListener('play', () => {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    console.log('Video is playing');
+    document.body.innerHTML += `<p>Video is playing</p>`;
     scanQRCode();
 });

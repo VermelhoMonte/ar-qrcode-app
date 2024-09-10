@@ -7,10 +7,16 @@ const canvas = document.getElementById('qrCanvas');
 const context = canvas.getContext('2d');
 
 // Start camera stream
-navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(stream => {
-    video.srcObject = stream;
-    video.play();
-});
+navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+    .then(stream => {
+        video.srcObject = stream;
+        video.play();
+        console.log('Camera stream started');
+    })
+    .catch((error) => {
+        console.error('Error accessing the camera:', error);
+        document.body.innerHTML += `<p>Error accessing the camera: ${error.message}</p>`;
+    });
 
 // Load 3D model when QR code is detected
 function load3DModel() {
@@ -50,5 +56,6 @@ function scanQRCode() {
 video.addEventListener('play', () => {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
+    console.log('Video is playing');
     scanQRCode();
 });

@@ -1,7 +1,3 @@
-import jsQR from 'jsqr';
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
 const video = document.getElementById('camera');
 const canvas = document.getElementById('qrCanvas');
 const context = canvas.getContext('2d');
@@ -11,7 +7,6 @@ navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
     .then(stream => {
         video.srcObject = stream;
         video.play();
-        document.body.innerHTML += `<p>Camera stream started</p>`;
         console.log('Camera stream started');
     })
     .catch((error) => {
@@ -27,8 +22,8 @@ function load3DModel() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    const loader = new GLTFLoader();
-    loader.load('model/model.gltf', gltf => {
+    const loader = new THREE.GLTFLoader();
+    loader.load('model/model.gltf', (gltf) => {
         scene.add(gltf.scene);
     });
 
@@ -43,11 +38,10 @@ function load3DModel() {
 function scanQRCode() {
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(imageData.data, canvas.width, canvas.height, { inversionAttempts: 'dontInvert' });
+    const code = jsQR(imageData.data, canvas.width, canvas.height);
 
     if (code) {
         console.log('QR Code detected:', code.data);
-        document.body.innerHTML += `<p>QR Code detected: ${code.data}</p>`; // Display QR code content        
         load3DModel();
     } else {
         requestAnimationFrame(scanQRCode);
@@ -57,6 +51,5 @@ function scanQRCode() {
 video.addEventListener('play', () => {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    document.body.innerHTML += `<p>Video is playing</p>`;
     scanQRCode();
 });

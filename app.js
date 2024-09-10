@@ -21,7 +21,7 @@ function load3DModel() {
     document.body.appendChild(renderer.domElement);
 
     const loader = new GLTFLoader();
-    loader.load('models/model.gltf', gltf => {
+    loader.load('model/model.gltf', gltf => {
         scene.add(gltf.scene);
     });
 

@@ -15,8 +15,9 @@
     <!-- Use Skypack CDN to import Three.js and GLTFLoader -->
     <script type="module">
         // Import Three.js and GLTFLoader from Skypack
-        import * as THREE from 'https://threejs.org/build/three.module.js';
-        import { GLTFLoader } from 'https://threejs.org/examples/jsm/loaders/GLTFLoader.js';
+        import * as THREE from './node_modules/three/build/three.module.js';
+        import { GLTFLoader } from './node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+        import jsQR from './node_modules/jsqr/dist/jsQR.js';  // Assuming you're using jsQR for QR code scanning
 
         const video = document.getElementById('camera');
         const canvas = document.getElementById('qrCanvas');
@@ -83,8 +84,5 @@
         }
     </script>
 </body>
-
-</html>
-
 
 </html>

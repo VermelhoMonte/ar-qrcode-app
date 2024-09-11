@@ -5,39 +5,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AR QR Code App</title>
-    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
     <h1>Scan a QR code to load 3D model</h1>
     <video id="camera" autoplay playsinline></video>
     <canvas id="qrCanvas"></canvas>
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
 
--->
-    <script type="module" src="app.js"></script>
-</body>
+    <!-- Use Skypack CDN to import Three.js and GLTFLoader -->
+    <script type="module">
+        // Import Three.js and GLTFLoader from Skypack
+        import * as THREE from 'https://cdn.skypack.dev/three';
+        import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.150.0/examples/jsm/loaders/GLTFLoader.js';
 
-<!--
-<body>
-    <h1>Camera Test</h1>
-    <video id="camera" autoplay playsinline></video>
-    <script>
         const video = document.getElementById('camera');
+        const canvas = document.getElementById('qrCanvas');
+        const context = canvas.getContext('2d');
 
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
             .then((stream) => {
                 video.srcObject = stream;
                 video.play();
+                console.log('Camera stream started');
             })
             .catch((error) => {
                 console.error('Error accessing the camera:', error);
                 document.body.innerHTML += `<p>Error accessing the camera: ${error.message}</p>`;
             });
+
+        video.addEventListener('loadedmetadata', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            scanQRCode();
+        });
+
+        function scanQRCode() {
+            if (video.videoWidth === 0 || video.videoHeight === 0) {
+                requestAnimationFrame(scanQRCode);
+                return;
+            }
+
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            try {
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+                if (code) {
+                    console.log('QR Code detected:', code.data);
+                    load3DModel();
+                } else {
+                    requestAnimationFrame(scanQRCode);
+                }
+            } catch (e) {
+                console.error('Error in getImageData:', e);
+                requestAnimationFrame(scanQRCode);
+            }
+        }
+
+        function load3DModel() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.Camera();
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            const loader = new GLTFLoader();
+            loader.load('models/model.gltf', (gltf) => {
+                scene.add(gltf.scene);
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
     </script>
 </body>
--->
+
+</html>
+
 
 </html>

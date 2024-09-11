@@ -1,3 +1,5 @@
+import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.150.0/examples/jsm/loaders/GLTFLoader.js';
+
 const video = document.getElementById('camera');
 const canvas = document.getElementById('qrCanvas');
 const context = canvas.getContext('2d');

@@ -36,20 +36,44 @@ function load3DModel() {
 
 // Detect QR code
 function scanQRCode() {
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(imageData.data, canvas.width, canvas.height);
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+        // Wait until the video has proper dimensions
+        requestAnimationFrame(scanQRCode);
+        return;
+    }
 
-    if (code) {
-        console.log('QR Code detected:', code.data);
-        load3DModel();
-    } else {
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    try {
+        // Try to get the image data from the canvas
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+        // Assuming jsQR is available and works
+        const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+        if (code) {
+            console.log('QR Code detected:', code.data);
+            load3DModel();
+        } else {
+            requestAnimationFrame(scanQRCode);
+        }
+    } catch (e) {
+        console.error('Error in getImageData:', e);
         requestAnimationFrame(scanQRCode);
     }
 }
+video.addEventListener('loadedmetadata', () => {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Now start scanning for QR codes after the video has proper dimensions
+    load3DModel();
+    //scanQRCode();
+});
 
 video.addEventListener('play', () => {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    scanQRCode();
+    load3DModel();
+    //scanQRCode();
 });

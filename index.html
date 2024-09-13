@@ -15,9 +15,9 @@
     <!-- Use Skypack CDN to import Three.js and GLTFLoader -->
     <script type="module">
         // Import Three.js and GLTFLoader from Skypack
-        import * as THREE from 'https://unpkg.com/three@0.150.0/build/three.module.js';
-        import { GLTFLoader } from 'https://unpkg.com/three@0.150.0/examples/jsm/loaders/GLTFLoader.js';
-        import jsQR from 'https://unpkg.com/jsqr/dist/jsQR.js';
+        import * as THREE from './node_modules/three/src/Three.js';
+        import { GLTFLoader } from './node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+        import jsQR from './node_modules/jsqr/dist/jsQR.js';
 
         const video = document.getElementById('camera');
         const canvas = document.getElementById('qrCanvas');

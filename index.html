@@ -12,12 +12,11 @@
     <video id="camera" autoplay playsinline></video>
     <canvas id="qrCanvas"></canvas>
 
-    <!-- Use Skypack CDN to import Three.js and GLTFLoader -->
+    <!-- Load local versions of Three.js, GLTFLoader, and jsQR from the 'libs' folder -->
     <script type="module">
-        // Import Three.js and GLTFLoader from Skypack
-        import * as THREE from './node_modules/three/src/Three.js';
-        import { GLTFLoader } from './node_modules/three/examples/jsm/loaders/GLTFLoader.js';
-        import jsQR from './node_modules/jsqr/dist/jsQR.js';
+        import * as THREE from './libs/three/build/three.module.js';
+        import { GLTFLoader } from './libs/three/examples/jsm/loaders/GLTFLoader.js';
+        import jsQR from './libs/jsqr/dist/jsQR.js';
 
         const video = document.getElementById('camera');
         const canvas = document.getElementById('qrCanvas');

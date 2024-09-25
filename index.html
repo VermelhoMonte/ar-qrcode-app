@@ -36,7 +36,8 @@
         video.addEventListener('loadedmetadata', () => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            scanQRCode();
+            load3DModel();
+            //scanQRCode();
         });
 
         function scanQRCode() {

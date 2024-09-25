@@ -13,11 +13,10 @@
     <canvas id="qrCanvas"></canvas>
 
     <!-- Load local versions of Three.js, GLTFLoader, and jsQR from the 'libs' folder -->
+    <script src="./libs/jsqr/dist/jsQR.js"></script>
     <script type="module">
         import * as THREE from './libs/three/build/three.module.js';
         import { GLTFLoader } from './libs/three/examples/jsm/loaders/GLTFLoader.js';
-        import { jsQR } from './libs/jsqr/dist/jsQR.js';
-
 
         const video = document.getElementById('camera');
         const canvas = document.getElementById('qrCanvas');

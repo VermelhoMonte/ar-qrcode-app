@@ -39,12 +39,12 @@
             updateStatus("Initializing 3D scene...");
 
             // Create a Three.js scene
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.z = 5;
 
             // Create the renderer and append it to the DOM
-            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer = new THREE.WebGLRenderer({ alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
 
@@ -55,7 +55,8 @@
             loader.load(
                 'model/model.gltf',
                 (gltf) => {
-                    scene.add(gltf.scene);
+                    model = gltf.scene;
+                    scene.add(model);
                     updateStatus("Model loaded successfully.");
                 },
                 (xhr) => {

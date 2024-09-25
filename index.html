@@ -22,6 +22,7 @@
         import { GLTFLoader } from './libs/three/examples/jsm/loaders/GLTFLoader.js';
 
         const statusElement = document.getElementById('status');
+        let camera, scene, renderer, model;
 
         function updateStatus(message) {
             console.log(message);
@@ -31,6 +32,7 @@
         // Initialize and load the 3D model when the app starts
         window.addEventListener('load', () => {
             load3DModel();
+            addZoomControls();
         });
 
         function load3DModel() {
@@ -75,6 +77,42 @@
 
             updateStatus("Rendering scene...");
         }
+        // Add zoom controls
+        function addZoomControls() {
+            // Handle mouse wheel scroll for zoom
+            window.addEventListener('wheel', (event) => {
+                if (event.deltaY > 0) {
+                    camera.position.z += 0.5; // Zoom out
+                } else {
+                    camera.position.z -= 0.5; // Zoom in
+                }
+                camera.position.z = Math.max(1, Math.min(100, camera.position.z)); // Limit zoom range
+            });
+
+            // Handle pinch gesture for mobile touch screens
+            let initialPinchDistance = null;
+
+            window.addEventListener('touchmove', (event) => {
+                if (event.touches.length === 2) {
+                    const dx = event.touches[0].pageX - event.touches[1].pageX;
+                    const dy = event.touches[0].pageY - event.touches[1].pageY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (initialPinchDistance === null) {
+                        initialPinchDistance = distance;
+                    } else {
+                        const pinchDelta = initialPinchDistance - distance;
+                        camera.position.z += pinchDelta * 0.01; // Adjust camera zoom
+                        camera.position.z = Math.max(1, Math.min(100, camera.position.z)); // Limit zoom range
+                        initialPinchDistance = distance; // Update the initial pinch distance for the next event
+                    }
+                }
+            });
+
+            window.addEventListener('touchend', () => {
+                initialPinchDistance = null; // Reset pinch zoom state
+            });
+        }        
     </script>
 </body>
 

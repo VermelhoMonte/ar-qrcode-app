@@ -4,83 +4,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR QR Code App</title>
+    <title>AR 3D Model App</title>
 </head>
 
 <body>
-    <h1>Scan a QR code to load 3D model</h1>
+    <h1>3D Model Viewer</h1>
     <video id="camera" autoplay playsinline></video>
     <canvas id="qrCanvas"></canvas>
+    <div id="status">Initializing...</div> <!-- Status Div -->
 
-    <!-- Load local versions of Three.js, GLTFLoader, and jsQR from the 'libs' folder -->
+    <!-- Load jsQR using a regular script tag (still included for future use if needed) -->
     <script src="./libs/jsqr/dist/jsQR.js"></script>
+
+    <!-- Load Three.js and GLTFLoader using ES modules -->
     <script type="module">
         import * as THREE from './libs/three/build/three.module.js';
         import { GLTFLoader } from './libs/three/examples/jsm/loaders/GLTFLoader.js';
 
-        const video = document.getElementById('camera');
-        const canvas = document.getElementById('qrCanvas');
-        const context = canvas.getContext('2d');
+        const statusElement = document.getElementById('status');
 
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then((stream) => {
-                video.srcObject = stream;
-                video.play();
-                console.log('Camera stream started');
-            })
-            .catch((error) => {
-                console.error('Error accessing the camera:', error);
-                document.body.innerHTML += `<p>Error accessing the camera: ${error.message}</p>`;
-            });
-
-        video.addEventListener('loadedmetadata', () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            load3DModel();
-            //scanQRCode();
-        });
-
-        function scanQRCode() {
-            if (video.videoWidth === 0 || video.videoHeight === 0) {
-                requestAnimationFrame(scanQRCode);
-                return;
-            }
-
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            try {
-                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                const code = jsQR(imageData.data, canvas.width, canvas.height);
-
-                if (code) {
-                    console.log('QR Code detected:', code.data);
-                    load3DModel();
-                } else {
-                    requestAnimationFrame(scanQRCode);
-                }
-            } catch (e) {
-                console.error('Error in getImageData:', e);
-                requestAnimationFrame(scanQRCode);
-            }
+        function updateStatus(message) {
+            console.log(message);
+            statusElement.textContent = message; // Updates the status in the HTML
         }
 
+        // Initialize and load the 3D model when the app starts
+        window.addEventListener('load', () => {
+            load3DModel();
+        });
+
         function load3DModel() {
+            updateStatus("Initializing 3D scene...");
+
+            // Create a Three.js scene
             const scene = new THREE.Scene();
-            const camera = new THREE.Camera();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            // Create the renderer and append it to the DOM
             const renderer = new THREE.WebGLRenderer({ alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
 
-            const loader = new GLTFLoader();
-            loader.load('models/model.gltf', (gltf) => {
-                scene.add(gltf.scene);
-            });
+            updateStatus("3D scene initialized. Loading model...");
 
+            // Load the GLTF model
+            const loader = new GLTFLoader();
+            loader.load(
+                'models/model.gltf',
+                (gltf) => {
+                    scene.add(gltf.scene);
+                    updateStatus("Model loaded successfully.");
+                },
+                (xhr) => {
+                    const progress = (xhr.loaded / xhr.total) * 100;
+                    updateStatus(`Model loading... ${Math.round(progress)}% complete.`);
+                },
+                (error) => {
+                    updateStatus("Error loading model.");
+                    console.error('An error happened', error);
+                }
+            );
+
+            // Animate the scene
             function animate() {
                 requestAnimationFrame(animate);
                 renderer.render(scene, camera);
             }
             animate();
+
+            updateStatus("Rendering scene...");
         }
     </script>
 </body>

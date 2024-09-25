@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR 3D Model App</title>
+</head>
+
+<body>
+    <h1>3D Model Viewer</h1>
+    <video id="camera" autoplay playsinline></video>
+    <canvas id="qrCanvas"></canvas>
+    <div id="status">Initializing...</div> <!-- Status Div -->
+
+    <!-- Load jsQR using a regular script tag (still included for future use if needed) -->
+    <script src="./libs/jsqr/dist/jsQR.js"></script>
+
+    <!-- Load Three.js and GLTFLoader using ES modules -->
+    <script type="module">
+        import * as THREE from './libs/three/build/three.module.js';
+        import { GLTFLoader } from './libs/three/examples/jsm/loaders/GLTFLoader.js';
+
+        const statusElement = document.getElementById('status');
+        let camera, scene, renderer, model;
+
+        function updateStatus(message) {
+            console.log(message);
+            statusElement.textContent = message; // Updates the status in the HTML
+        }
+
+        // Initialize and load the 3D model when the app starts
+        window.addEventListener('load', () => {
+            load3DModel();
+            addZoomControls();
+        });
+
+        function load3DModel() {
+            updateStatus("Initializing 3D scene...");
+
+            // Create a Three.js scene
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            // Create the renderer and append it to the DOM
+            renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            updateStatus("3D scene initialized. Loading model...");
+
+            // Load the GLTF model
+            const loader = new GLTFLoader();
+            loader.load(
+                'model/model.gltf',
+                (gltf) => {
+                    model = gltf.scene;
+                    scene.add(model);
+                    updateStatus("Model loaded successfully.");
+                },
+                (xhr) => {
+                    const progress = (xhr.loaded / xhr.total) * 100;
+                    updateStatus(`Model loading... ${Math.round(progress)}% complete.`);
+                },
+                (error) => {
+                    updateStatus("Error loading model.");
+                    console.error('An error happened', error);
+                }
+            );
+
+            // Animate the scene
+            function animate() {
+                requestAnimationFrame(animate);
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            updateStatus("Rendering scene...");
+        }
+        // Add zoom controls
+        function addZoomControls() {
+            // Handle mouse wheel scroll for zoom
+            window.addEventListener('wheel', (event) => {
+                if (event.deltaY > 0) {
+                    camera.position.z += 0.5; // Zoom out
+                } else {
+                    camera.position.z -= 0.5; // Zoom in
+                }
+                camera.position.z = Math.max(1, Math.min(100, camera.position.z)); // Limit zoom range
+            });
+
+            // Handle pinch gesture for mobile touch screens
+            let initialPinchDistance = null;
+
+            window.addEventListener('touchmove', (event) => {
+                if (event.touches.length === 2) {
+                    const dx = event.touches[0].pageX - event.touches[1].pageX;
+                    const dy = event.touches[0].pageY - event.touches[1].pageY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (initialPinchDistance === null) {
+                        initialPinchDistance = distance;
+                    } else {
+                        const pinchDelta = initialPinchDistance - distance;
+                        camera.position.z += pinchDelta * 0.01; // Adjust camera zoom
+                        camera.position.z = Math.max(1, Math.min(100, camera.position.z)); // Limit zoom range
+                        initialPinchDistance = distance; // Update the initial pinch distance for the next event
+                    }
+                }
+            });
+
+            window.addEventListener('touchend', () => {
+                initialPinchDistance = null; // Reset pinch zoom state
+            });
+        }        
+    </script>
+</body>
+
+</html>

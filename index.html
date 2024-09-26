@@ -12,7 +12,24 @@
     <!-- Load the AR.js library (for A-Frame integration) -->
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
 
+    <!-- Add custom script to listen for marker recognition -->
+    <script>
+        AFRAME.registerComponent('markerhandler', {
+            init: function () {
+                var marker = this.el;
 
+                // Event listener for marker detection
+                marker.addEventListener('markerFound', function () {
+                    alert("Marker recognized!");
+                });
+
+                // Optionally, listen for markerLost if needed
+                marker.addEventListener('markerLost', function () {
+                    console.log("Marker lost.");
+                });
+            }
+        });
+    </script>
 
 </head>
 
@@ -21,8 +38,8 @@
 
     <!-- AR.js uses A-Frame for the AR view -->
     <a-scene embedded arjs="sourceType: webcam;">
-        <!-- Create an anchor for the AR marker -->
-        <a-marker preset="hiro">
+        <!-- Create an anchor for the AR marker and add the markerhandler component -->
+        <a-marker preset="hiro" markerhandler>
             <a-entity position="0 0 0" scale="0.05 0.05 0.05" gltf-model="./model/model.gltf"></a-entity>
         </a-marker>
         <a-entity camera></a-entity>
